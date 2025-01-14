@@ -33,6 +33,10 @@ impl Time {
         ms += parts.ff as i128 * timebase.milliseconds_per_frame() as i128;
         Ok(Time { data: ms })
     }
+    
+    pub fn to_timecode(&self, timebase: &Timebase) -> String {
+        todo!()
+    }
 
     pub fn from_timestamp(timecode: &str) -> Result<Self, TimecodeFormatError> {
         let parts = TimecodeParts::from_timestamp(timecode)?;
@@ -41,6 +45,10 @@ impl Time {
         ms += parts.ss as i128 * 1000;
         ms += (parts.ff as f64 / 1000.0) as i128;
         Ok(Time { data: ms })
+    }
+    
+    pub fn to_timestamp(&self) -> String{
+        todo!()
     }
 }
 
@@ -116,3 +124,5 @@ impl Div<f64> for Time {
         Time { data }
     }
 }
+
+
