@@ -33,9 +33,24 @@ impl Time {
         ms += parts.ff as i128 * timebase.milliseconds_per_frame() as i128;
         Ok(Time { data: ms })
     }
-    
+
     pub fn to_timecode(&self, timebase: &Timebase) -> String {
-        todo!()
+        let milliseconds = (self.data % 1000) as f64 / 1000.0;
+        let ff = (milliseconds * timebase.fps as f64) as u32;
+        let seconds = self.data / 1000;
+        let ss = (seconds % 60) as u8;
+        let minutes = seconds / 60;
+        let mm = (minutes % 60) as u8;
+        let hours = minutes / 60;
+        let hh = (hours % 24) as u8;
+        TimecodeParts {
+            hh,
+            mm,
+            ss,
+            ff,
+            drop_frame: timebase.drop_frame,
+        }
+        .to_timecode()
     }
 
     pub fn from_timestamp(timecode: &str) -> Result<Self, TimecodeFormatError> {
@@ -46,9 +61,23 @@ impl Time {
         ms += (parts.ff as f64 / 1000.0) as i128;
         Ok(Time { data: ms })
     }
-    
-    pub fn to_timestamp(&self) -> String{
-        todo!()
+
+    pub fn to_timestamp(&self) -> String {
+        let ff = (self.data % 1000) as u32;
+        let seconds = self.data / 1000;
+        let ss = (seconds % 60) as u8;
+        let minutes = seconds / 60;
+        let mm = (minutes % 60) as u8;
+        let hours = minutes / 60;
+        let hh = (hours % 24) as u8;
+        TimecodeParts {
+            hh,
+            mm,
+            ss,
+            ff,
+            drop_frame: false,
+        }
+        .to_timestamp()
     }
 }
 
@@ -124,5 +153,3 @@ impl Div<f64> for Time {
         Time { data }
     }
 }
-
-

@@ -17,7 +17,7 @@ pub struct TimecodeParts {
     pub hh: u8,
     pub mm: u8,
     pub ss: u8,
-    pub ff: u8,
+    pub ff: u32,
     pub drop_frame: bool,
 }
 
@@ -35,7 +35,7 @@ impl TimecodeParts {
         let minutes: u8 = captures[2].parse().map_err(|_| TimecodeFormatError)?;
         let sep: String = captures[3].parse().map_err(|_| TimecodeFormatError)?;
         let seconds: u8 = captures[4].parse().map_err(|_| TimecodeFormatError)?;
-        let frames: u8 = captures[5].parse().map_err(|_| TimecodeFormatError)?;
+        let frames: u32 = captures[5].parse().map_err(|_| TimecodeFormatError)?;
 
         Ok(TimecodeParts {
             hh: hours,
@@ -58,7 +58,7 @@ impl TimecodeParts {
         let hours: u8 = captures[1].parse().map_err(|_| TimecodeFormatError)?;
         let minutes: u8 = captures[2].parse().map_err(|_| TimecodeFormatError)?;
         let seconds: u8 = captures[3].parse().map_err(|_| TimecodeFormatError)?;
-        let frames: u8 = captures[4].parse().map_err(|_| TimecodeFormatError)?;
+        let frames: u32 = captures[4].parse().map_err(|_| TimecodeFormatError)?;
 
         Ok(TimecodeParts {
             hh: hours,
@@ -84,5 +84,3 @@ impl TimecodeParts {
         )
     }
 }
-
-
