@@ -1,21 +1,18 @@
-use super::Time;
+use crate::core::Time;
 
-
-pub trait TimeRange{
+pub trait TimeRange {
     fn start(&self) -> Time;
     fn duration(&self) -> Time;
-    fn end(&self) -> Time{
+    fn end(&self) -> Time {
         self.start() + self.duration()
     }
-    
-    fn contains(&self, time: &Time) -> bool{
+
+    fn contains(&self, time: &Time) -> bool {
         self.start() <= *time && *time <= self.end()
     }
-    
-    fn overlaps(&self, other: &dyn TimeRange) -> bool{
+
+    fn overlaps(&self, other: &dyn TimeRange) -> bool {
         // self.contains(&other.start()) || self.contains(&other.end()) || other.contains(&self.start()) || other.contains(&self.end())
-    self.start() <= other.end() && self.end() >= other.start()
+        self.start() <= other.end() && self.end() >= other.start()
     }
-    
-    
 }
