@@ -10,4 +10,5 @@ pub trait TrackManager<T:TimelineItem<T>+TimeRange> {
     fn insert_track(&mut self, index: usize, track: Self::TrackType);
     fn track_at(&self, index: usize) -> Option<Box<Self::TrackType>>;
     fn remove_track(&mut self, index: usize);
+    fn track_count(&self) -> usize;
 }
