@@ -88,12 +88,12 @@ impl Track {
 
 impl TimeRange for Track {
     fn start(&self) -> Time {
-        Time::new()
+        Time::new(0)
     }
 
     fn duration(&self) -> Time {
         if self.items.is_empty() {
-            return Time::new();
+            return Time::new(0);
         }
         self.items.last().unwrap().end()
     }

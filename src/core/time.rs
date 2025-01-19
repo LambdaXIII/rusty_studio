@@ -3,16 +3,22 @@
 use super::timebase::Timebase;
 use super::timecode_support::*;
 use std::hash::Hash;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
 #[derive(Debug)]
 pub struct Time {
     data: i128,
 }
 
-impl Time {
-    pub fn new() -> Time {
+impl Default for Time {
+    fn default() -> Self {
         Time { data: 0 }
+    }
+}
+
+impl Time {
+    pub fn new(m: i128) -> Time {
+        Time { data: m }
     }
 
     pub fn from_millisecond(m: i128) -> Time {
@@ -54,7 +60,7 @@ impl Time {
             ff,
             drop_frame: timebase.drop_frame,
         }
-            .to_timecode()
+        .to_timecode()
     }
 
     pub fn from_timestamp(timecode: &str) -> Result<Self, TimecodeFormatError> {
@@ -81,7 +87,7 @@ impl Time {
             ff,
             drop_frame: false,
         }
-            .to_timestamp()
+        .to_timestamp()
     }
 }
 
@@ -155,5 +161,17 @@ impl Div<f64> for Time {
         let m = self.data as f64 / other;
         let data = m.round() as i128;
         Time { data }
+    }
+}
+
+impl AddAssign<Time> for Time {
+    fn add_assign(&mut self, rhs: Time) {
+        self.data += rhs.data;
+    }
+}
+
+impl SubAssign<Time> for Time {
+    fn sub_assign(&mut self, rhs: Time) {
+        self.data -= rhs.data;
     }
 }

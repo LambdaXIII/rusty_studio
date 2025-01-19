@@ -12,4 +12,6 @@ pub use track_manager::TrackManager;
 
 
 mod timeline;
+mod timeline_item;
+
 pub use timeline::Timeline;
