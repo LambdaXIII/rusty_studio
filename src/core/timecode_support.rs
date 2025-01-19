@@ -25,16 +25,17 @@ impl TimecodeParts {
     pub fn from_timecode(tc: &str) -> Result<Self, TimecodeFormatError> {
         let re = Regex::new(r"(\d{2}):(\d{2}):(\d{2})([;:])(\d{2})").unwrap();
 
-        if !re.is_match(tc) {
+        let captures = re.captures(tc);
+        if captures.is_none() {
             return Err(TimecodeFormatError);
         }
 
-        let captures = re.captures(tc).unwrap();
+        let captures = captures.unwrap();
 
         let hours: u8 = captures[1].parse().map_err(|_| TimecodeFormatError)?;
         let minutes: u8 = captures[2].parse().map_err(|_| TimecodeFormatError)?;
-        let sep: String = captures[3].parse().map_err(|_| TimecodeFormatError)?;
-        let seconds: u8 = captures[4].parse().map_err(|_| TimecodeFormatError)?;
+        let seconds: u8 = captures[3].parse().map_err(|_| TimecodeFormatError)?;
+        let sep: String = captures[4].parse().map_err(|_| TimecodeFormatError)?;
         let frames: u32 = captures[5].parse().map_err(|_| TimecodeFormatError)?;
 
         Ok(TimecodeParts {
@@ -49,11 +50,12 @@ impl TimecodeParts {
     pub fn from_timestamp(tc: &str) -> Result<Self, TimecodeFormatError> {
         let re = Regex::new(r"(\d{2}):(\d{2}):(\d{2})[.,:;](\d{3})").unwrap();
 
-        if !re.is_match(tc) {
+        let captures = re.captures(tc);
+        if captures.is_none() {
             return Err(TimecodeFormatError);
         }
 
-        let captures = re.captures(tc).unwrap();
+        let captures = captures.unwrap();
 
         let hours: u8 = captures[1].parse().map_err(|_| TimecodeFormatError)?;
         let minutes: u8 = captures[2].parse().map_err(|_| TimecodeFormatError)?;

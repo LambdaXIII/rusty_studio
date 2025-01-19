@@ -19,6 +19,10 @@ impl Time {
         Time { data: m }
     }
 
+    pub fn to_millisecond(&self) -> i128 {
+        self.data
+    }
+
     pub fn from_seconds(seconds: &f64) -> Self {
         Time {
             data: (seconds * 1000.0).round() as i128,
@@ -36,7 +40,7 @@ impl Time {
 
     pub fn to_timecode(&self, timebase: &Timebase) -> String {
         let milliseconds = (self.data % 1000) as f64 / 1000.0;
-        let ff = (milliseconds * timebase.fps as f64) as u32;
+        let ff = (milliseconds / 1000.0 * timebase.fps as f64) as u32;
         let seconds = self.data / 1000;
         let ss = (seconds % 60) as u8;
         let minutes = seconds / 60;
