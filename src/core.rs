@@ -1,8 +1,11 @@
 #![allow(unused_imports)]
 
 pub mod timecode_support;
-pub mod time;
-pub mod timebase;
 
-pub use timebase::*;
+mod time;
+mod timebase;
+mod metadata_support;
+
+pub use metadata_support::*;
 pub use time::*;
+pub use timebase::*;

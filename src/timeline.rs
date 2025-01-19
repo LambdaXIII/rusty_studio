@@ -1,10 +1,15 @@
 #![allow(unused_imports)]
 
-pub mod time_range;
+mod time_range;
 pub use time_range::TimeRange;
 
-pub mod timeline_item;
-pub use timeline_item::*;
-
-pub mod track;
+mod track;
 pub use track::Track;
+
+
+mod track_manager;
+pub use track_manager::TrackManager;
+
+
+mod timeline;
+pub use timeline::Timeline;
