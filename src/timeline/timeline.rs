@@ -1,4 +1,4 @@
-use super::{Track, TrackManager};
+use super::{TimeRange, Track, TrackManager};
 use crate::core::MetadataSupport;
 use std::collections::HashMap;
 
@@ -9,8 +9,10 @@ pub struct Timeline {
 
 impl Timeline {
     pub fn new() -> Self {
+        let mut tracks = Vec::new();
+        tracks.push(Box::new(Track::default()));
         Self {
-            tracks: Vec::new(),
+            tracks,
             metadata: Box::new(Default::default()),
         }
     }
@@ -38,11 +40,30 @@ impl TrackManager for Timeline {
         if index >= self.tracks.len() {
             return None;
         }
-        Some(self.tracks.remove(index))
+        let result = self.tracks.remove(index);
+        if self.tracks.is_empty(){
+            self.tracks.push(Box::new(Track::default()));
+        }
+        Some(result)
     }
 
     fn track_count(&self) -> usize {
         self.tracks.len()
+    }
+
+    fn clear_tracks(&mut self) {
+        self.tracks.clear();
+        self.tracks.push(Box::new(Track::default()))
+    }
+
+    fn auto_insert_item(&mut self, item: Box<dyn TimeRange>) {
+        for i in 0..self.tracks.len(){
+            let t = self.tracks.get_mut(i).unwrap();
+            match t.try_add_item(item){
+                Ok(_)=> return,
+                Err(_) => continue,
+            }
+        }
     }
 }
 

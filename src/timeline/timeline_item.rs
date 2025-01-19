@@ -4,6 +4,16 @@ use super::TimeRange;
 use crate::core::{MetadataSupport, Time};
 use std::collections::HashMap;
 
+
+/**
+TimelineItem 是一个时间线片段的示例实现。它使用泛型参数T表示片段所包含的内容。
+注意：
+Track 结构体并不要求所保存的对象是一个 TimelineItem， 只要是实现了 TimeRange 的对象都是可以的。
+
+TimelineItem 模拟了一般时间线上的片段的信息，一般情况下还是很方便使用的。
+它首先是一个 TimeRange 可以表示为时间段，另外实现了设置时间点的方法。
+然后提供了 MetadataSupport 的简单支持，可以使用字符串键保存信息。
+*/
 struct TimelineItem<T: Clone> {
     start: Time,
     duration: Time,
