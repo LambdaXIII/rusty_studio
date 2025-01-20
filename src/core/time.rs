@@ -60,7 +60,7 @@ impl Time {
             ff,
             drop_frame: timebase.drop_frame,
         }
-        .to_timecode()
+            .to_timecode()
     }
 
     pub fn from_timestamp(timecode: &str) -> Result<Self, TimecodeFormatError> {
@@ -87,7 +87,7 @@ impl Time {
             ff,
             drop_frame: false,
         }
-        .to_timestamp()
+            .to_timestamp()
     }
 }
 

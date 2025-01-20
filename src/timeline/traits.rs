@@ -1,3 +1,18 @@
+use std::any::Any;
+
+pub trait ContentSupport {
+    fn get_content<T>(&self) -> Option<T>
+    where
+        T: Any + Sync + Send + Clone;
+
+    fn set_content<T>(&mut self, content: T)
+    where
+        T: Any + Sync + Send + Clone;
+
+    fn clear_content(&mut self);
+}
+
+
 use crate::core::Time;
 
 
@@ -14,7 +29,7 @@ timeline模块中的很多内容都实现了或要求对象实现这个trait。
 pub trait TimeRange {
     fn start(&self) -> Time;
     fn duration(&self) -> Time;
-    
+
     ///返回时间段的结束时间点。默认实现是根据 start 和 duration 计算的。
     fn end(&self) -> Time {
         self.start() + self.duration()
@@ -29,5 +44,19 @@ pub trait TimeRange {
     fn overlaps(&self, other: &dyn TimeRange) -> bool {
         // self.contains(&other.start()) || self.contains(&other.end()) || other.contains(&self.start()) || other.contains(&self.end())
         self.start() <= other.end() && self.end() >= other.start()
+    }
+}
+
+pub trait TimeRangeEditable
+where
+    Self: TimeRange,
+{
+    fn set_start(&mut self, start: Time);
+    fn set_duration(&mut self, duration: Time);
+    fn set_end(&mut self, end: Time) {
+        self.set_duration(end - self.start());
+    }
+    fn shift_time(&mut self, shift: Time) {
+        self.set_start(self.start() + shift);
     }
 }

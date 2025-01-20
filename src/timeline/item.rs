@@ -1,0 +1,132 @@
+#![allow(dead_code)]
+
+use crate::core::{DataBox, MetadataSupport, Time};
+use crate::timeline::{ContentSupport, TimeRange, TimeRangeEditable};
+use std::any::Any;
+use std::cell::{RefCell, RefMut};
+use std::fmt::{Debug, Formatter};
+use std::rc::Rc;
+
+pub struct Item {
+    start: Time,
+    duration: Time,
+    metadata: RefCell<DataBox>,
+    content: Option<Rc<dyn Any + Send + Sync>>,
+}
+
+impl Item {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn from_time_range<T: TimeRange>(range: T) -> Self {
+        Self {
+            start: range.start(),
+            duration: range.duration(),
+            ..Default::default()
+        }
+    }
+
+    pub fn metadata(&self) -> RefMut<DataBox> {
+        self.metadata.borrow_mut()
+    }
+}
+
+impl Default for Item {
+    fn default() -> Self {
+        Self {
+            start: Time::new(0),
+            duration: Time::new(0),
+            metadata: RefCell::new(DataBox::default()),
+            content: None,
+        }
+    }
+}
+
+impl Clone for Item {
+    fn clone(&self) -> Self {
+        Self {
+            start: self.start,
+            duration: self.duration,
+            metadata: RefCell::new(self.metadata.borrow().clone()),
+            content: self.content.clone(),
+        }
+    }
+}
+
+impl ContentSupport for Item {
+    fn get_content<T>(&self) -> Option<T>
+    where
+        T: Any + Sync + Send + Clone,
+    {
+        self.content
+            .clone()
+            .and_then(|c| c.downcast_ref().and_then(Clone::clone))
+    }
+
+    fn set_content<T>(&mut self, content: T)
+    where
+        T: Any + Sync + Send + Clone,
+    {
+        self.content = Some(Rc::new(content))
+    }
+
+    fn clear_content(&mut self) {
+        self.content = None
+    }
+}
+
+impl TimeRange for Item {
+    fn start(&self) -> Time {
+        self.start
+    }
+
+    fn duration(&self) -> Time {
+        self.duration
+    }
+}
+
+impl TimeRangeEditable for Item {
+    fn set_start(&mut self, start: Time) {
+        self.start = start;
+    }
+
+    fn set_duration(&mut self, duration: Time) {
+        self.duration = duration;
+    }
+}
+
+impl MetadataSupport for Item {
+    fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &String) -> Option<T> {
+        self.metadata.borrow().get(key)
+    }
+
+    fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &String, value: T) {
+        self.metadata.borrow_mut().set(key, value);
+    }
+
+    fn erase_metadata(&mut self, key: &String) {
+        self.metadata.borrow_mut().erase(key);
+    }
+
+    fn clear_metadata(&mut self) {
+        self.metadata.borrow_mut().clear();
+    }
+}
+
+impl Debug for Item {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Item")
+            .field("start", &self.start)
+            .field("end", &self.end())
+            .field("duration", &self.duration)
+            .field(
+                "content",
+                match &self.content {
+                    None => &"None",
+                    Some(_) => &"Yes",
+                },
+            )
+            .finish()
+    }
+}

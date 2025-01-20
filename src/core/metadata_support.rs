@@ -1,9 +1,8 @@
-#![allow(dead_code)]
-
-use std::collections::HashMap;
+use std::any::Any;
 
 pub trait MetadataSupport {
-    fn set_metadata(&mut self, key: String, value: String);
-    fn get_metadata(&self, key: &String) -> Option<&String>;
-    fn get_all_metadata(&self) -> Box<HashMap<String, String>>;
+    fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &String) -> Option<T>;
+    fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &String, value: T);
+    fn erase_metadata(&mut self, key: &String);
+    fn clear_metadata(&mut self);
 }
