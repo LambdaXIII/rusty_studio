@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 
-pub mod timecode_support;
+pub mod timecode_parts;
 
 mod time;
 mod timebase;

@@ -7,6 +7,16 @@ use std::cell::{RefCell, RefMut};
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 
+
+/**
+Item 表示一个存在于时间线上的片段。
+它可以是一个多媒体片段，也可以是一段字幕，或是一个时间线标记。
+其Content的类型是动态的，所以在使用时请自行追踪它使用的类型。
+---
+Item represents a segment on the timeline.
+It can be a multimedia segment, a subtitle, or a timeline marker.
+The type of the Content is dynamic, so please track it yourself.
+*/
 pub struct Item {
     start: Time,
     duration: Time,

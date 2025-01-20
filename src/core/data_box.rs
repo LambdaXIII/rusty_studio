@@ -5,6 +5,13 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
 
+
+/**
+DataBox 本质上是一个 HashMap，但是它可以存取任意类型的信息。
+使用字符串键检索或插入数据，数据将会保存。
+
+它只能用于简单地保存一些数据，它并不是一个严谨的数据结构。
+*/
 #[derive(Debug,Clone)]
 pub struct DataBox {
     data_ref: Box<HashMap<String, Arc<dyn Any + Send + Sync>>>,
