@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 
-pub mod timecode_parts;
+mod timecode_parts;
 
 mod time;
 mod timebase;
@@ -13,3 +13,4 @@ pub use data_box::*;
 pub use metadata_support::*;
 pub use time::*;
 pub use timebase::*;
+pub use timecode_parts::*;

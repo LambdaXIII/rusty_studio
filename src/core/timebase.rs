@@ -26,27 +26,46 @@ they are processed as integer approximations and are only discarded in the outpu
 Since this tool set is designed to be simple, fast and easy to use,
 it does not provide support for frame rates less than 1 or high frame rates.
 */
-#[derive(Debug,Clone,Copy,Eq,PartialEq,Hash)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub struct Timebase {
     pub fps: u8,
     pub drop_frame: bool,
 }
 
 impl Timebase {
+    ///直接指定帧速率以构造一个新的 Timebase。
     pub fn new(fps: u8) -> Self {
-        Timebase { fps, drop_frame: false }
+        Timebase {
+            fps,
+            drop_frame: false,
+        }
     }
 
     /**
     从一个浮点数自动识别时基信息。
-    
+
     原理非常简单，如果输入的数字四舍五入之后仍然相同，那么就认为它不丢帧，否则认为它丢帧。
     而帧速率则直接使用四舍五入的近似值。
     -----
     Automatically identify timebase information from a floating point number.
-    
+
     The principle is very simple. If the rounded number after rounding is still the same,
     then it is not dropped, otherwise it is dropped.
+    -----
+    Example:
+    ```rust
+    # use rusty_studio::core::Timebase;
+    let timebase = Timebase::from_real_fps(23.976);
+    assert_eq!(timebase.fps,24);
+    assert_eq!(timebase.drop_frame,true);
+    ```
+
+    ```rust
+    # use rusty_studio::core::Timebase;
+    let timebase = Timebase::from_real_fps(24.0);
+    assert_eq!(timebase.fps,24);
+    assert_eq!(timebase.drop_frame,false);
+    ```
     */
     pub fn from_real_fps(fps: f64) -> Self {
         let base_fps = (fps * 100.0) as i32;
@@ -58,14 +77,43 @@ impl Timebase {
         }
     }
 
-    pub fn milliseconds_per_frame(&self) -> u64 {
-        1000 / self.fps as u64
+    /**
+    根据 fps 统计帧数占用的毫秒数。
+    Calculate the number of milliseconds of a mount of frames, depending on fps.
+
+    Example:
+    ```rust
+    # use rusty_studio::core::Timebase;
+    let timebase = Timebase::new(24);
+    let frames = 100;
+    let ms = timebase.milliseconds_from_frames(frames);
+    assert_eq!(ms,4167);
+    ```
+    */
+    pub fn milliseconds_from_frames(&self, frames: u64) -> i128 {
+        ((frames as f64 / self.fps as f64) * 1000.0).round() as i128
+    }
+
+    /**
+    Calculate frames from milliseconds.
+    Example:
+    ```rust
+    # use rusty_studio::core::Timebase;
+    let timebase = Timebase::new(24);
+    let ms = 4166;
+    let frames = timebase.frames_from_milliseconds(ms);
+    assert_eq!(frames,100);
+    ```
+    */
+    pub fn frames_from_milliseconds(&self, ms: i128) -> u64 {
+        let seconds = ms as f64 / 1000.0;
+        (seconds * self.fps as f64).round() as u64
     }
 }
 
 impl Default for Timebase {
     fn default() -> Self {
-        Self{
+        Self {
             fps: 24,
             drop_frame: false,
         }

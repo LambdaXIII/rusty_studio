@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+///在时间码字符串解析出错时抛出的错误。
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TimecodeFormatError;
 
@@ -35,6 +36,32 @@ pub struct TimecodeParts {
 }
 
 impl TimecodeParts {
+    /**
+    Parse timecode parts from a String.
+    
+    Example:
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts::from_timecode("00:00:05:15").unwrap();
+    assert_eq!(parts.hh, 0);
+    assert_eq!(parts.mm, 0);
+    assert_eq!(parts.ss, 5);
+    assert_eq!(parts.ff, 15);
+    assert_eq!(parts.drop_frame, false);
+    ```
+    
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts::from_timecode("wrong");
+    assert!(parts.is_err());
+    ```
+    
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts::from_timecode("00:00:05;15").unwrap();
+    assert_eq!(parts.drop_frame,true)
+    ```
+    */
     pub fn from_timecode(tc: &str) -> Result<Self, TimecodeFormatError> {
         let re = Regex::new(r"(\d{2}):(\d{2}):(\d{2})([;:])(\d{2})").unwrap();
 
@@ -60,6 +87,26 @@ impl TimecodeParts {
         })
     }
 
+    /**
+    Parse timestamp parts from a String.
+    
+    Example:
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts::from_timestamp("12:34:56.789").unwrap();
+    assert_eq!(parts.hh, 12);
+    assert_eq!(parts.mm, 34);
+    assert_eq!(parts.ss, 56);
+    assert_eq!(parts.ff, 789);
+    assert_eq!(parts.drop_frame, false);
+    ```
+    
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts::from_timestamp("wrong");
+    assert!(parts.is_err());
+    ```
+    */
     pub fn from_timestamp(tc: &str) -> Result<Self, TimecodeFormatError> {
         let re = Regex::new(r"(\d{2}):(\d{2}):(\d{2})[.,:;](\d{3})").unwrap();
 
@@ -84,6 +131,36 @@ impl TimecodeParts {
         })
     }
 
+    /**
+    Construct a timecode String.
+    
+    Example:
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts{
+        hh:12,
+        mm:34,
+        ss:56,
+        ff:78,
+        drop_frame:false,
+    };
+    let timecode = parts.to_timecode();
+    assert_eq!(timecode,"12:34:56:78");
+    ```
+    
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts{
+        hh:1,
+        mm:2,
+        ss:3,
+        ff:45,
+        drop_frame:true,
+    };
+    let timecode = parts.to_timecode();
+    assert_eq!(timecode,"01:02:03;45");
+    ```
+    */
     pub fn to_timecode(&self) -> String {
         let sep = if self.drop_frame { ";" } else { ":" };
         format!(
@@ -92,6 +169,23 @@ impl TimecodeParts {
         )
     }
 
+    /**
+    Construct a timestamp String.
+
+    Example:
+    ```rust
+    # use rusty_studio::core::TimecodeParts;
+    let parts = TimecodeParts{
+        hh:12,
+        mm:34,
+        ss:56,
+        ff:789,
+        drop_frame:false,
+    };
+    let ts = parts.to_timestamp();
+    assert_eq!(ts,"12:34:56.789");
+    ```
+    */
     pub fn to_timestamp(&self) -> String {
         format!(
             "{:02}:{:02}:{:02}.{:03}",

@@ -11,6 +11,31 @@ DataBox 本质上是一个 HashMap，但是它可以存取任意类型的信息�
 使用字符串键检索或插入数据，数据将会保存。
 
 它只能用于简单地保存一些数据，它并不是一个严谨的数据结构。
+
+-----
+Examples:
+```rust
+# use rusty_studio::core::DataBox;
+let mut data_box = DataBox::default();
+data_box.set("key",123);
+let value = data_box.get::<i32>("key");
+assert_eq!(value,Some(123));
+
+data_box.set("key2",String::from("super!"));
+let value = data_box.get::<String>("key2");
+assert_eq!(value,Some(String::from("super!")));
+
+let got  = data_box.get::<i32>("key3");
+assert_eq!(got,None);
+
+data_box.erase("key");
+let got  = data_box.get::<i32>("key");
+assert_eq!(got,None);
+
+data_box.clear();
+let got  = data_box.get::<i32>("key2");
+assert_eq!(got,None);
+```
 */
 #[derive(Debug,Clone)]
 pub struct DataBox {
@@ -30,6 +55,7 @@ impl DataBox {
         Self::default()
     }
 
+    ///根据键获取数据。
     pub fn get<T>(&self, key: &str) -> Option<T>
     where
         T: Any + Sync + Send + Clone,
@@ -39,6 +65,7 @@ impl DataBox {
             .and_then(|any| any.downcast_ref::<T>().cloned())
     }
 
+    ///保存数据。
     pub fn set<T>(&mut self, key: &str, value: T)
     where
         T: Any + Sync + Send + Clone,
@@ -54,14 +81,6 @@ impl DataBox {
         self.data_ref.clear();
     }
 }
-
-/*impl Clone for DataBox {
-    fn clone(&self) -> Self {
-        Self {
-            data_ref: self.data_ref.to_owned(),
-        }
-    }
-}*/
 
 impl<T> From<HashMap<String, Arc<T>>> for DataBox
 where
