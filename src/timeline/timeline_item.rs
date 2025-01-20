@@ -4,7 +4,6 @@ use super::TimeRange;
 use crate::core::{MetadataSupport, Time};
 use std::collections::HashMap;
 
-
 /**
 TimelineItem 是一个时间线片段的示例实现。它使用泛型参数T表示片段所包含的内容。
 注意：
@@ -80,6 +79,17 @@ impl<T: Clone> Default for TimelineItem<T> {
     }
 }
 
+impl<T: Clone> Clone for TimelineItem<T> {
+    fn clone(&self) -> Self {
+        Self {
+            start: self.start,
+            duration: self.duration,
+            content: self.content.clone(),
+            metadata: self.metadata.to_owned(),
+        }
+    }
+}
+
 impl<T: Clone> TimeRange for TimelineItem<T> {
     fn start(&self) -> Time {
         self.start
@@ -90,9 +100,9 @@ impl<T: Clone> TimeRange for TimelineItem<T> {
     }
 }
 
-impl <T:Clone> MetadataSupport for TimelineItem<T>{
+impl<T: Clone> MetadataSupport for TimelineItem<T> {
     fn set_metadata(&mut self, key: String, value: String) {
-        self.metadata.insert(key,value);
+        self.metadata.insert(key, value);
     }
 
     fn get_metadata(&self, key: &String) -> Option<&String> {
