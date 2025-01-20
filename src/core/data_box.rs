@@ -1,8 +1,11 @@
+#![allow(dead_code)]
+
 use std::any::Any;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::sync::Arc;
 
+#[derive(Debug,Clone)]
 pub struct DataBox {
     data_ref: Box<HashMap<String, Arc<dyn Any + Send + Sync>>>,
 }
@@ -45,13 +48,13 @@ impl DataBox {
     }
 }
 
-impl Clone for DataBox {
+/*impl Clone for DataBox {
     fn clone(&self) -> Self {
         Self {
             data_ref: self.data_ref.to_owned(),
         }
     }
-}
+}*/
 
 impl<T> From<HashMap<String, Arc<T>>> for DataBox
 where

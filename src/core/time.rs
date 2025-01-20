@@ -5,7 +5,7 @@ use super::timecode_support::*;
 use std::hash::Hash;
 use std::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct Time {
     data: i128,
 }
@@ -60,7 +60,7 @@ impl Time {
             ff,
             drop_frame: timebase.drop_frame,
         }
-            .to_timecode()
+        .to_timecode()
     }
 
     pub fn from_timestamp(timecode: &str) -> Result<Self, TimecodeFormatError> {
@@ -87,44 +87,13 @@ impl Time {
             ff,
             drop_frame: false,
         }
-            .to_timestamp()
+        .to_timestamp()
     }
 }
 
 impl From<i128> for Time {
     fn from(data: i128) -> Time {
         Time { data }
-    }
-}
-
-impl Clone for Time {
-    fn clone(&self) -> Time {
-        Time { data: self.data }
-    }
-}
-impl Copy for Time {}
-
-impl PartialEq for Time {
-    fn eq(&self, other: &Time) -> bool {
-        self.data == other.data
-    }
-}
-impl Eq for Time {}
-
-impl PartialOrd for Time {
-    fn partial_cmp(&self, other: &Time) -> Option<std::cmp::Ordering> {
-        self.data.partial_cmp(&other.data)
-    }
-}
-impl Ord for Time {
-    fn cmp(&self, other: &Time) -> std::cmp::Ordering {
-        self.data.cmp(&other.data)
-    }
-}
-
-impl Hash for Time {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.data.hash(state);
     }
 }
 
