@@ -151,7 +151,7 @@ Access metadata storage using these functions.
 Example:
 ```rust
 # use rusty_studio::timeline::Item;
-# use rusty_studio::core::MetadataSupport;;
+# use rusty_studio::core::MetadataSupport;
 let mut item = Item::new();
 item.set_metadata("number1", 123);
 item.set_metadata("number2",456.78);
