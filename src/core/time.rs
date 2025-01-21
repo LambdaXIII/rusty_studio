@@ -249,6 +249,12 @@ impl From<i128> for Time {
     }
 }
 
+impl Into<i128> for Time{
+    fn into(self) -> i128 {
+        self.data
+    }
+}
+
 /**
 Time 可以和 Time 相加，
 

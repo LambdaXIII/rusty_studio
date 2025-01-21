@@ -1,47 +1,71 @@
-
 use crate::core::Time;
 
-
 /**
-TimeRange 设定了基本的对于时间段的支持
+Defines basic functions for a TimeRange.
 
-TimeRange 的默认实现要求对象保存开始时间点和时长两个信息，
-结束时间点将根据这两个部分自动计算。
-如果使用其它的方法保存时间信息，有可能需要重写全部三个方法。
-其它的基于时间的方法也会根据这三个函数的返回值进行计算。
-
-timeline模块中的很多内容都实现了或要求对象实现这个trait。
+The default implement assumes the struct stores only the start time point
+and the duration, the end time point will be calculated from the two `Time`.
 */
 pub trait TimeRangeTrait {
+    /// Start time of the TimeRange
     fn start(&self) -> Time;
+    
+    /// Duration of the TimeRange
     fn duration(&self) -> Time;
 
-    ///返回时间段的结束时间点。默认实现是根据 start 和 duration 计算的。
+    /**
+    End time of the TimeRange.
+    
+    Default implement depends on the result of `start()` and `duration()`.
+    */
     fn end(&self) -> Time {
         self.start() + self.duration()
     }
 
-    ///判断此时间段中是否包含某个时间点。
+    ///If this TimeRange contains a time point.
     fn contains(&self, time: &Time) -> bool {
         self.start() <= *time && *time <= self.end()
     }
 
-    ///判断是否和另一个TimeRange相交。
+    ///Check if this TimeRange is overlapped with another TimeRange.
     fn overlaps(&self, other: &dyn TimeRangeTrait) -> bool {
         // self.contains(&other.start()) || self.contains(&other.end()) || other.contains(&self.start()) || other.contains(&self.end())
         self.start() <= other.end() && self.end() >= other.start()
     }
 }
 
+/**
+Mutable functions for TimeRange.
+
+Provides functions to manipulate TimeRange.
+
+Depends on TimeRangeTrait.
+*/
 pub trait TimeRangeEditableTrait
 where
     Self: TimeRangeTrait,
 {
+    ///Set a new start time
     fn set_start(&mut self, start: Time);
+    
+    ///Set the duration fo the TimeRange
     fn set_duration(&mut self, duration: Time);
+    
+    /**
+    Set the end time of the TimeRange.
+    
+    By default, it will set the duration of the TimeRange.
+    */
     fn set_end(&mut self, end: Time) {
         self.set_duration(end - self.start());
     }
+    
+    /**
+    Shift the time points of the TimeRange, duration remains.
+    
+    By default, it only shifts the start time point,
+    Since the end point is always calculated from duration.
+    */
     fn shift_time(&mut self, shift: Time) {
         self.set_start(self.start() + shift);
     }
