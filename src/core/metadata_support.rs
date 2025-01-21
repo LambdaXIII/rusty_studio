@@ -1,8 +1,10 @@
 use std::any::Any;
 
 /**
+提供基础的元数据存取功能。
 Provide metadata storage functions.
 
+建议使用 `DataBox` 实现此功能。
 Using `DataBox` to implement this trait is recommended.
 */
 pub trait MetadataSupport {

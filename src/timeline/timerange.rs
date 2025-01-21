@@ -1,11 +1,22 @@
 use super::{TimeRangeEditableTrait, TimeRangeTrait};
 use crate::core::Time;
 
+/**
+一个纯粹的时间范围结构体。
+Simply represents a time range.
+
+除了实现了 TimeRangeTrait 和 TimeRangeEditableTrait 之外，
+还增加了一些额外的方法用于操作时间段。
+
+Though, it also implements some methods to operate the time range,
+other than TimeRangeTrait and TimeRangeEditableTrait.
+*/
 #[derive(Debug, Clone, Copy)]
 pub struct TimeRange {
     start: Time,
     duration: Time,
 }
+
 
 impl TimeRange {
     pub fn new(start: Time, duration: Time) -> Self {
@@ -20,6 +31,7 @@ impl TimeRange {
     }
 
     /**
+    从另一个 TimeRangeTrait 对象构造时间段。
     Construct Timerange from another struct implemented TimeRangeTrait.
 
     Example:
@@ -40,6 +52,7 @@ impl TimeRange {
     }
 
     /**
+    生成一个包含给定时间段的所有时间段的时间段。
     Generate a time range contains the whole time range of given time ranges.
 
     `ranges` is an iterator of time ranges.

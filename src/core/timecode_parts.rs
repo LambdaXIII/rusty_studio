@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-///在时间码字符串解析出错时抛出的错误。
+///在时间码字符串解析出错时抛出的错误。 | Error which occurs when failed to parse a timecode/timestamp string.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TimecodeFormatError;
 
@@ -17,12 +17,11 @@ use regex::Regex;
 
 /**
 简单地保存时间码的各个部分，并将他们排版成为时间码或时间戳。
+Simply stores all the parts of a timecode,
+and struct a timecode/timestamp string from them.
 
 通常你也许并不需要用到这个结构体，因为它只是从 `Time` 的相关功能中分离出来而已。
 但是如果需要的话，你也可以使用它作为一个工具来实现自己的时间码生成功能。
-
-TimecodeParts simply stores all the parts of a timecode,
-and struct a timecode/timestamp string from them.
 
 Usually, you don't need to use it, since it is just a separated part of `Time`.
 But, you still can use it to construct timecode/timestamp strings in your own struct.
@@ -37,6 +36,7 @@ pub struct TimecodeParts {
 
 impl TimecodeParts {
     /**
+    从一个时间码字符串解析出各个部分。
     Parse timecode parts from a String.
     
     Example:
@@ -88,6 +88,7 @@ impl TimecodeParts {
     }
 
     /**
+    从一个时间戳字符串解析出各个部分。
     Parse timestamp parts from a String.
     
     Example:
@@ -132,6 +133,7 @@ impl TimecodeParts {
     }
 
     /**
+    构造一个时间码字符串。
     Construct a timecode String.
     
     Example:
@@ -170,6 +172,7 @@ impl TimecodeParts {
     }
 
     /**
+    构造一个时间戳字符串。
     Construct a timestamp String.
 
     Example:

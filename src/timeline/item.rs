@@ -8,21 +8,28 @@ use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 
 /**
+表示一个存在于时间线上的片段。
 Represents a segment on the timeline.
+
+它可以是一个多媒体片段，也可以是一段字幕，或是一个时间线标记。
+其Content的类型是动态的，所以在使用时请自行追踪它使用的类型。
 
 It can be a multimedia segment, a subtitle, or a timeline marker.
 The type of the Content is dynamic, so please track it yourself.
 
-Item 表示一个存在于时间线上的片段。
-
-它可以是一个多媒体片段，也可以是一段字幕，或是一个时间线标记。
-其Content的类型是动态的，所以在使用时请自行追踪它使用的类型。
+它实现了这些Trait：
+ - `ContentSupport`: 支持存取多种类型的`内容`
+ - `TimeRange`: 提供时间范围信息。
+ - `TimeRangeEditable`: 支持时间范围的编辑。
+ - `MetadataSupport`: 支持存取元数据。
 
 Item implemented such traits:
  - `ContentSupport`: support for content.
  - `TimeRange`: provide time range information.
  - `TimeRangeEditable`: support for time range editing.
  - `MetadataSupport`: support for metadata storage.
+
+另外提供了一个 `metadata()` 方法直接暴露内部 `DataBox` 的 RefMut。
 
 There is also a `metadata()` function which provided a RefMut way to edit the DataBox inside.
 */
@@ -38,7 +45,7 @@ impl Item {
         Self::default()
     }
 
-    ///Construct an Item from a TimeRange.
+    ///从另一个 TimeRangeTrait 对象构造一个空的片段 | Construct an Item from a TimeRange.
     pub fn from_timerange<T: TimeRangeTrait>(range: T) -> Self {
         Self {
             start: range.start(),
@@ -146,6 +153,7 @@ impl TimeRangeEditableTrait for Item {
 }
 
 /**
+提供存取元数据的支持。
 Access metadata storage using these functions.
 
 Example:
@@ -161,6 +169,7 @@ assert_eq!(item.get_metadata::<f64>("number2"), Some(456.78));
 assert_eq!(item.get_metadata::<String>("note"), Some(String::from("This is a note")));
 assert_eq!(item.get_metadata::<i32>("unknown metadata"), None);
 ```
+*要不是为了单元测试，我才不想写这些示例代码呢*
 */
 impl MetadataSupport for Item {
     fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {

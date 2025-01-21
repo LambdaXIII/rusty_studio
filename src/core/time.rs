@@ -6,37 +6,22 @@ use std::hash::Hash;
 use std::ops::{Add, AddAssign, Div, Mul, Sub, SubAssign};
 
 /**
+表示一个时间向量。
 Represents a time vector.
+
+它可以表示一个时刻或一段时长，但是本质上它是表示时间的一维向量。
+也就是说 **Time 可以是一个负值** ，所以使用时请务必小心时间的方向，
+本工具集不对时间方向错乱导致的任何灾难负责。
 
 It can represent a moment or a duration, but its essence is a one-dimensional vector.
 In other words, ** Time can be a negative value. **
 So use it carefully to avoid any errors caused by the direction of time.
 This toolkit is not responsible for any errors caused by the direction of time.
 
+因为大部分的多媒体制作中，时间都是以毫秒为单位的，所以 Time 默认的时间精度也**精确到毫秒**。
+
 Because most of the multimedia making uses milliseconds as the unit,
 the default precision of Time is also **exact to milliseconds**.
-
-Time is an immutable type, so you cannot directly modify the value of Time.
-Time can be created by `Time::from_millisecond()` or `Time::from_seconds()`.
-Time can be sorted by time itself, or can be added or subtracted.
-Time can also be multiplied or divided by a number to achieve the effect of calculating the number of times.
-Of course, **Time cannot be divided by 0.**
-
-Time also provides support for timecode text.
-Time can be created by `Time::from_timecode()` or `Time::from_timestamp()`.
-Time can also be converted to timecode text by `Time::to_timecode()` or `Time::to_timestamp()`.
-The form of `hh:mm:ss:ff` is called `timecode`, and the timecode needs to provide `Timebase` information when converting;
-The form of `hh:mm:ss.MMM` is called `timestamp`, where `MMM` is milliseconds, so timestamp does not need timebase information.
-
------
-
-表示一个时间向量。
-
-它可以表示一个时刻或一段时长，但是本质上它是表示时间的一维向量。
-也就是说 **Time 可以是一个负值** ，所以使用时请务必小心时间的方向，
-本工具集不对时间方向错乱导致的任何灾难负责。
-
-因为大部分的多媒体制作中，时间都是以毫秒为单位的，所以 Time 默认的时间精度也**精确到毫秒**。
 
 Time 是一个不可变类型，所以你不能直接修改 Time 的值。
 Time 可以通过 `Time::from_millisecond()` 或 `Time::from_seconds()` 来创建一个新的 Time。
@@ -45,11 +30,23 @@ Time 可以通过 `Time::from_millisecond()` 或 `Time::from_seconds()` 来创�
 Time 可以依据时间大小排序，也可以互相进行加减运算；也可以乘以或者除以一个数字以达到计算数倍时间的效果。
 **注意 Time 不可以除以 0.**
 
+Time is an immutable type, so you cannot directly modify the value of Time.
+Time can be created by `Time::from_millisecond()` or `Time::from_seconds()`.
+Time can be sorted by time itself, or can be added or subtracted.
+Time can also be multiplied or divided by a number to achieve the effect of calculating the number of times.
+Of course, **Time cannot be divided by 0.**
+
 另外，Time 也提供了对于时间码文本的支持。
 Time 可以通过 `Time::from_timecode()` 或 `Time::from_timestamp()` 来创建一个新的 Time。
 也可以通过 `Time::to_timecode()` 或 `Time::to_timestamp()` 来将 Time 转换为时间码文本。
 其中形如 `hh:mm:ss:ff` 的形式被称为 `时间码`，时间码在转换时需要通过 `Timebase` 提供时基信息；
 而形如 `hh:mm:ss.MMM` 的形式被称为 `时间戳`，其中的 `MMM` 为毫秒数，所以时间戳不需要时基信息。
+
+Time also provides support for timecode text.
+Time can be created by `Time::from_timecode()` or `Time::from_timestamp()`.
+Time can also be converted to timecode text by `Time::to_timecode()` or `Time::to_timestamp()`.
+The form of `hh:mm:ss:ff` is called `timecode`, and the timecode needs to provide `Timebase` information when converting;
+The form of `hh:mm:ss.MMM` is called `timestamp`, where `MMM` is milliseconds, so timestamp does not need timebase information.
 */
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct Time {
@@ -58,6 +55,7 @@ pub struct Time {
 
 impl Default for Time {
     /**
+    构造一个默认的 Time，其值为 0。
     Construct a default Time, its value is 0.
     
     Example:
@@ -73,23 +71,23 @@ impl Default for Time {
 }
 
 impl Time {
-    ///直接通过一个 i128 毫秒数创建一个新的 Time。
+    ///直接通过一个 i128 毫秒数创建一个新的 Time。 | Construct a new Time with a millisecond value.
     pub fn new(m: i128) -> Time {
         Time { data: m }
     }
 
     
-    ///通过一个 i128 毫秒数创建一个新的 Time。
+    ///通过一个 i128 毫秒数创建一个新的 Time。 | Construct a new Time with a millisecond value.
     pub fn from_millisecond(m: i128) -> Time {
         Time { data: m }
     }
     
-    ///转换为毫秒数。其实是直接读取了内部的数据。
+    ///转换为毫秒数。其实是直接读取了内部的数据。 | Convert to milliseconds.
     pub fn to_millisecond(&self) -> i128 {
         self.data
     }
 
-    ///转换为秒（作为浮点数）。
+    ///转换为秒（作为浮点数）。 | Convert to seconds (as a floating point number).
     pub fn to_second(&self) -> f64 {
         self.data as f64 / 1000.0
     }
@@ -99,7 +97,10 @@ impl Time {
     }
 
     /**
+    从秒（作为浮点数）创建一个新的 Time。
     Construct Time from a f64 seconds.
+    
+    此浮点数将会四舍五入至毫秒精度。
     Value of seconds will be rounded to the nearest millisecond.
 
     Example:
@@ -119,12 +120,12 @@ impl Time {
 
     /**
     从时间码文本创建一个新的 Time。
+    Create a new Time from timecode text.
     
     时间码文本使用正则表达式判断并解析，如果解析失败，将会返回一个 `TimecodeFormatError` 错误。
 
     注意：`时间码` 在本工具集中特指 `hh:mm:ss:ff` 的形式。
-    
-    Create a new Time from timecode text.
+        
     The timecode text is parsed using a regular expression and checked.
     Note: `timecode` refers to the form of `hh:mm:ss:ff` in this toolset.
 
@@ -150,6 +151,7 @@ impl Time {
 
     /**
     将 Time 转换为时间码文本。
+    Convert to `timecode` string.
     
     其作用和 `Time::from_timecode()` 相反。
 
@@ -182,6 +184,7 @@ impl Time {
 
     /**
     从时间戳文本创建一个新的 Time。
+    Make a Time from a `timestamp` string.
     
     时间戳文本使用正则表达式判断并解析，如果解析失败，将会返回一个 `TimecodeFormatError` 错误。
 
@@ -214,6 +217,7 @@ impl Time {
 
     /**
     将 Time 转换为时间戳文本。
+    Convert to `timestamp` string.
     
     其作用和 `Time::from_timestamp()` 相反。
     Example:
@@ -256,9 +260,8 @@ impl Into<i128> for Time{
 }
 
 /**
-Time 可以和 Time 相加，
-
-相加之后的 Time 为两个时间向量之和。
+Time 可以和 Time 相加，相加之后的 Time 为两个时间向量之和。
+Time can add another Time, and the result is a new Time.
 
 Example:
 ```rust
@@ -287,6 +290,7 @@ impl Add<Time> for Time {
 }
 
 /**
+Time可以和其它Time相减。
 Time can also subtract another Time.
 
 Example:
@@ -308,7 +312,9 @@ impl Sub<Time> for Time {
 }
 
 /**
+Time 可以和一个数字相乘或相除。
 Time can also multiply or divide by a number.
+
 Example:
 ```rust
 # use rusty_studio::core::Time;
@@ -343,14 +349,14 @@ impl Div<f64> for Time {
 }
 
 impl AddAssign<Time> for Time {
-    /// Provide operator `+=` to another Time
+    ///提供加等操作 | Provide operator `+=` to another Time
     fn add_assign(&mut self, rhs: Time) {
         self.data += rhs.data;
     }
 }
 
 impl SubAssign<Time> for Time {
-    ///Provide operator `-=` to another Time
+    ///提供减等操作 | Provide operator `-=` to another Time
     fn sub_assign(&mut self, rhs: Time) {
         self.data -= rhs.data;
     }

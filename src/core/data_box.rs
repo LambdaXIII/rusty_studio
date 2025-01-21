@@ -7,6 +7,7 @@ use std::sync::Arc;
 
 
 /**
+提供基本的元数据存取功能。
 Provide basic storage for simple information.
 
 DataBox 本质上是一个 HashMap，但是它可以存取任意类型的信息。
@@ -56,7 +57,7 @@ impl DataBox {
         Self::default()
     }
 
-    ///根据键获取数据。
+    ///根据键获取数据 | Get data by key.
     pub fn get<T>(&self, key: &str) -> Option<T>
     where
         T: Any + Sync + Send + Clone,
@@ -66,7 +67,7 @@ impl DataBox {
             .and_then(|any| any.downcast_ref::<T>().cloned())
     }
 
-    ///保存数据。
+    ///保存数据。 | Save data.
     pub fn set<T>(&mut self, key: &str, value: T)
     where
         T: Any + Sync + Send + Clone,
