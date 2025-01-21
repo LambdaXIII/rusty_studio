@@ -1,21 +1,30 @@
 #![allow(dead_code)]
 
 use crate::core::{DataBox, MetadataSupport, Time};
-use crate::timeline::{ContentSupport, TimeRange, TimeRangeEditable};
+use crate::timeline::{ContentSupport, TimeRangeTrait, TimeRangeEditableTrait};
 use std::any::Any;
 use std::cell::{RefCell, RefMut};
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 
-
 /**
-Item 表示一个存在于时间线上的片段。
-它可以是一个多媒体片段，也可以是一段字幕，或是一个时间线标记。
-其Content的类型是动态的，所以在使用时请自行追踪它使用的类型。
----
-Item represents a segment on the timeline.
+Represents a segment on the timeline.
+
 It can be a multimedia segment, a subtitle, or a timeline marker.
 The type of the Content is dynamic, so please track it yourself.
+
+Item 表示一个存在于时间线上的片段。
+
+它可以是一个多媒体片段，也可以是一段字幕，或是一个时间线标记。
+其Content的类型是动态的，所以在使用时请自行追踪它使用的类型。
+
+Item implemented such traits:
+ - `ContentSupport`: support for content.
+ - `TimeRange`: provide time range information.
+ - `TimeRangeEditable`: support for time range editing.
+ - `MetadataSupport`: support for metadata storage.
+
+There is also a `metadata()` function which provided a RefMut way to edit the DataBox inside.
 */
 pub struct Item {
     start: Time,
@@ -29,7 +38,8 @@ impl Item {
         Self::default()
     }
 
-    pub fn from_time_range<T: TimeRange>(range: T) -> Self {
+    ///Construct an Item from a TimeRange.
+    pub fn from_timerange<T: TimeRangeTrait>(range: T) -> Self {
         Self {
             start: range.start(),
             duration: range.duration(),
@@ -86,7 +96,7 @@ impl ContentSupport for Item {
     }
 }
 
-impl TimeRange for Item {
+impl TimeRangeTrait for Item {
     fn start(&self) -> Time {
         self.start
     }
@@ -96,7 +106,7 @@ impl TimeRange for Item {
     }
 }
 
-impl TimeRangeEditable for Item {
+impl TimeRangeEditableTrait for Item {
     fn set_start(&mut self, start: Time) {
         self.start = start;
     }

@@ -7,12 +7,13 @@ use std::sync::Arc;
 
 
 /**
+Provide basic storage for simple information.
+
 DataBox 本质上是一个 HashMap，但是它可以存取任意类型的信息。
 使用字符串键检索或插入数据，数据将会保存。
 
 它只能用于简单地保存一些数据，它并不是一个严谨的数据结构。
 
------
 Examples:
 ```rust
 # use rusty_studio::core::DataBox;

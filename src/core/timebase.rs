@@ -11,7 +11,7 @@ Timebase 时一个简单的结构体，保存了帧速率和是否丢帧的时�
 只是在输出时会按照固定的规范丢弃画面。所以，在 Timebase 中使用整数保存帧速率信息。
 
 鉴于此工具集的定位就是简单、快速、易用，所以诸如小于1的帧速率或超高帧速率之类的情况暂时不提供支持。
------
+
 Timebase is a simple struct that stores the frame rate and drop frame information.
 The frame rate information used in multimedia workflows is represented in many ways,
 such as: "24p", "24.000p", "23.976p" and so on.
@@ -46,12 +46,12 @@ impl Timebase {
 
     原理非常简单，如果输入的数字四舍五入之后仍然相同，那么就认为它不丢帧，否则认为它丢帧。
     而帧速率则直接使用四舍五入的近似值。
-    -----
+    
     Automatically identify timebase information from a floating point number.
 
     The principle is very simple. If the rounded number after rounding is still the same,
     then it is not dropped, otherwise it is dropped.
-    -----
+    
     Example:
     ```rust
     # use rusty_studio::core::Timebase;

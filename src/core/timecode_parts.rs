@@ -16,11 +16,11 @@ use regex::Regex;
 
 
 /**
-TimecodeParts 简单地保存时间码的各个部分，并将他们排版成为时间码或时间戳。
+简单地保存时间码的各个部分，并将他们排版成为时间码或时间戳。
 
 通常你也许并不需要用到这个结构体，因为它只是从 `Time` 的相关功能中分离出来而已。
 但是如果需要的话，你也可以使用它作为一个工具来实现自己的时间码生成功能。
------
+
 TimecodeParts simply stores all the parts of a timecode,
 and struct a timecode/timestamp string from them.
 
