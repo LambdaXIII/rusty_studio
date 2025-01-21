@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use crate::core::{DataBox, MetadataSupport, Time};
-use crate::timeline::{ContentSupport, TimeRangeTrait, TimeRangeEditableTrait};
+use crate::timeline::{ContentSupport, TimeRangeEditableTrait, TimeRangeTrait};
 use std::any::Any;
 use std::cell::{RefCell, RefMut};
 use std::fmt::{Debug, Formatter};
@@ -74,14 +74,43 @@ impl Clone for Item {
     }
 }
 
+/**
+提供以*任意*类型保存片段内容的支持。
+Provide support for store a content in Any type.
+
+Exp1 基本操作:
+```rust
+# use rusty_studio::timeline::{Item,ContentSupport};
+let mut item = Item::new();
+item.set_content::<i32>(123);
+assert_eq!(item.get_content::<i32>(), Some(123));
+item.set_content(String::from("Hello World!"));
+assert_eq!(item.get_content::<String>(), Some(String::from("Hello World!")));
+item.clear_content();
+assert_eq!(item.get_content::<String>(), None);
+```
+
+Exp2 使用自定义类型:
+```rust
+# use rusty_studio::timeline::{Item,ContentSupport};
+#[derive(Debug, Clone, Eq, PartialEq)]
+struct RGBColor {
+    r:u8,g:u8,b:u8
+}
+
+let color = RGBColor { r: 255, g: 128, b: 32 };
+let mut item = Item::default();
+item.set_content(color.clone());
+assert_eq!(item.get_content::<RGBColor>(), Some(color));
+```
+*/
 impl ContentSupport for Item {
     fn get_content<T>(&self) -> Option<T>
     where
         T: Any + Sync + Send + Clone,
     {
-        self.content
-            .clone()
-            .and_then(|c| c.downcast_ref().and_then(Clone::clone))
+        self.content.clone()
+            .and_then(|rc| rc.downcast_ref::<T>().cloned())
     }
 
     fn set_content<T>(&mut self, content: T)
@@ -116,12 +145,29 @@ impl TimeRangeEditableTrait for Item {
     }
 }
 
+/**
+Access metadata storage using these functions.
+
+Example:
+```rust
+# use rusty_studio::timeline::Item;
+# use rusty_studio::core::MetadataSupport;;
+let mut item = Item::new();
+item.set_metadata("number1", 123);
+item.set_metadata("number2",456.78);
+item.set_metadata("note", String::from("This is a note"));
+assert_eq!(item.get_metadata::<i32>("number1"), Some(123));
+assert_eq!(item.get_metadata::<f64>("number2"), Some(456.78));
+assert_eq!(item.get_metadata::<String>("note"), Some(String::from("This is a note")));
+assert_eq!(item.get_metadata::<i32>("unknown metadata"), None);
+```
+*/
 impl MetadataSupport for Item {
-    fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &String) -> Option<T> {
+    fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {
         self.metadata.borrow().get(key)
     }
 
-    fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &String, value: T) {
+    fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &str, value: T) {
         self.metadata.borrow_mut().set(key, value);
     }
 
