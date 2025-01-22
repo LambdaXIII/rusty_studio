@@ -1,3 +1,4 @@
+#![allow(unused_macros)]
 use super::{TimeRangeEditableTrait, TimeRangeTrait};
 use crate::core::Time;
 
@@ -16,7 +17,6 @@ pub struct TimeRange {
     start: Time,
     duration: Time,
 }
-
 
 impl TimeRange {
     pub fn new(start: Time, duration: Time) -> Self {
