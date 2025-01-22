@@ -1,12 +1,12 @@
 #![allow(unused_imports)]
 
-mod traits;
+mod content_support_trait;
 mod item;
 mod timerange;
 mod timerange_trait;
 mod track;
 
-pub use traits::*;
+pub use content_support_trait::*;
 pub use timerange_trait::*;
 
 pub use timerange::*;
