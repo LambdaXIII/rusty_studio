@@ -3,7 +3,7 @@
 use crate::core::{DataBox, MetadataSupport, Time};
 use crate::timeline::{ContentSupport, TimeRangeEditableTrait, TimeRangeTrait};
 use std::any::Any;
-use std::cell::{RefCell, RefMut};
+use std::cell::RefCell;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 
@@ -28,10 +28,6 @@ Item implemented such traits:
  - `TimeRange`: provide time range information.
  - `TimeRangeEditable`: support for time range editing.
  - `MetadataSupport`: support for metadata storage.
-
-另外提供了一个 `metadata()` 方法直接暴露内部 `DataBox` 的 RefMut。
-
-There is also a `metadata()` function which provided a RefMut way to edit the DataBox inside.
 */
 pub struct Item {
     start: Time,
@@ -52,10 +48,6 @@ impl Item {
             duration: range.duration(),
             ..Default::default()
         }
-    }
-
-    pub fn metadata(&self) -> RefMut<DataBox> {
-        self.metadata.borrow_mut()
     }
 }
 
@@ -116,7 +108,8 @@ impl ContentSupport for Item {
     where
         T: Any + Sync + Send + Clone,
     {
-        self.content.clone()
+        self.content
+            .clone()
             .and_then(|rc| rc.downcast_ref::<T>().cloned())
     }
 
@@ -173,7 +166,7 @@ assert_eq!(item.get_metadata::<i32>("unknown metadata"), None);
 */
 impl MetadataSupport for Item {
     fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {
-        self.metadata.borrow().get(key)
+        Option::<&T>::cloned(self.metadata.borrow().get(key))
     }
 
     fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &str, value: T) {

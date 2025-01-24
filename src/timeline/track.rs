@@ -4,6 +4,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::ops::Deref;
+use std::sync::RwLock;
 
 pub struct Track {
     items: Vec<Box<Item>>,
@@ -38,8 +39,9 @@ impl Track {
 
     fn update_end_cache(&mut self, item: &dyn TimeRangeTrait) {
         if self.end_cache.borrow().is_some() {
-            if self.end_cache.borrow().unwrap() < item.end() {
-                self.end_cache.replace(Some(item.end()));
+            let x  = self.end_cache.borrow().unwrap();
+            if x < item.end(){
+                self.end_cache.borrow_mut().replace(item.end());
             }
         }
     }
