@@ -36,8 +36,16 @@ pub struct Item {
 }
 
 impl Item {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new<T>(start: i128, duration: i128, content: T) -> Self
+    where
+        T: Any + Send + Sync + Clone,
+    {
+        Self {
+            start: Time::new(start),
+            duration: Time::new(duration),
+            metadata: DataBox::default(),
+            content: Some(Rc::new(content)),
+        }
     }
 
     ///从另一个 TimeRangeTrait 对象构造一个空的片段 | Construct an Item from a TimeRange.
@@ -79,7 +87,7 @@ Provide support for store a content in Any type.
 Exp1 基本操作:
 ```rust
 # use rusty_studio::timeline::{Item,ContentSupport};
-let mut item = Item::new();
+let mut item = Item::default();
 item.set_content::<i32>(123);
 assert_eq!(item.get_content::<i32>(), Some(123));
 item.set_content(String::from("Hello World!"));

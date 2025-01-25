@@ -7,7 +7,7 @@ use std::ops::Deref;
 
 pub struct Track {
     items: Vec<Box<Item>>,
-    metadata: RefCell<DataBox>,
+    metadata: DataBox,
     end_cache: RefCell<Option<Time>>,
 }
 
@@ -15,7 +15,7 @@ impl Default for Track {
     fn default() -> Self {
         Self {
             items: vec![],
-            metadata: RefCell::new(DataBox::default()),
+            metadata: DataBox::default(),
             end_cache: RefCell::new(None),
         }
     }
@@ -25,7 +25,7 @@ impl Clone for Track {
     fn clone(&self) -> Self {
         Self {
             items: self.items.clone(),
-            metadata: RefCell::new(self.metadata.borrow().clone()),
+            metadata: self.metadata.clone(),
             end_cache: RefCell::new(None),
         }
     }
@@ -259,18 +259,18 @@ impl TimeRangeTrait for Track {
 
 impl MetadataSupport for Track {
     fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {
-        self.metadata.borrow().get(key)
+        self.metadata.get(key)
     }
 
     fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &str, value: T) {
-        self.metadata.borrow_mut().set(key, value);
+        self.metadata.set(key, value);
     }
 
     fn erase_metadata(&mut self, key: &String) {
-        self.metadata.borrow_mut().erase(key);
+        self.metadata.erase(key);
     }
 
     fn clear_metadata(&mut self) {
-        self.metadata.borrow_mut().clear();
+        self.metadata.clear();
     }
 }
