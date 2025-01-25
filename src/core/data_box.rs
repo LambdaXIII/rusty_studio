@@ -1,8 +1,10 @@
 #![allow(dead_code)]
 
 use std::any::Any;
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::rc::Rc;
 use std::sync::Arc;
 
 
@@ -14,6 +16,9 @@ DataBox 本质上是一个 HashMap，但是它可以存取任意类型的信息�
 使用字符串键检索或插入数据，数据将会保存。
 
 它只能用于简单地保存一些数据，它并不是一个严谨的数据结构。
+
+DataBox 内部使用 Cow 存储一个 HashMap，实现了内部隐式共享数据，
+所以拷贝性能是很高的。
 
 Examples:
 ```rust
@@ -41,13 +46,13 @@ assert_eq!(got,None);
 */
 #[derive(Debug,Clone)]
 pub struct DataBox {
-    data_ref: Box<HashMap<String, Arc<dyn Any + Send + Sync>>>,
+    data: Cow<'static,HashMap<String, Rc<dyn Any + Send + Sync>>>,
 }
 
 impl Default for DataBox {
     fn default() -> Self {
         Self {
-            data_ref: Box::new(HashMap::new()),
+            data: Cow::Owned(HashMap::new()),
         }
     }
 }
@@ -62,7 +67,7 @@ impl DataBox {
     where
         T: Any + Sync + Send + Clone,
     {
-        self.data_ref
+        self.data
             .get(key)
             .and_then(|any| any.downcast_ref::<T>().cloned())
     }
@@ -72,27 +77,14 @@ impl DataBox {
     where
         T: Any + Sync + Send + Clone,
     {
-        self.data_ref.insert(String::from(key), Arc::new(value));
+        self.data.to_mut().insert(String::from(key), Rc::new(value));
     }
 
     pub fn erase(&mut self, key: &str) {
-        self.data_ref.remove(key);
+        self.data.to_mut().remove(key);
     }
 
     pub fn clear(&mut self) {
-        self.data_ref.clear();
-    }
-}
-
-impl<T> From<HashMap<String, Arc<T>>> for DataBox
-where
-    T: Any + Sync + Send + Clone,
-{
-    fn from(data: HashMap<String, Arc<T>>) -> Self {
-        let mut result = Self::default();
-        for (k, v) in data.into_iter() {
-            result.data_ref.insert(k, v.clone() as Arc<dyn Any + Send + Sync>);
-        }
-        result
+        self.data.to_mut().clear();
     }
 }

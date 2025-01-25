@@ -3,7 +3,6 @@
 use crate::core::{DataBox, MetadataSupport, Time};
 use crate::timeline::{ContentSupport, TimeRangeEditableTrait, TimeRangeTrait};
 use std::any::Any;
-use std::cell::RefCell;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 
@@ -32,7 +31,7 @@ Item implemented such traits:
 pub struct Item {
     start: Time,
     duration: Time,
-    metadata: RefCell<DataBox>,
+    metadata: DataBox,
     content: Option<Rc<dyn Any + Send + Sync>>,
 }
 
@@ -56,7 +55,7 @@ impl Default for Item {
         Self {
             start: Time::new(0),
             duration: Time::new(0),
-            metadata: RefCell::new(DataBox::default()),
+            metadata: DataBox::default(),
             content: None,
         }
     }
@@ -67,7 +66,7 @@ impl Clone for Item {
         Self {
             start: self.start,
             duration: self.duration,
-            metadata: RefCell::new(self.metadata.borrow().clone()),
+            metadata: self.metadata.clone(),
             content: self.content.clone(),
         }
     }
@@ -153,7 +152,7 @@ Example:
 ```rust
 # use rusty_studio::timeline::Item;
 # use rusty_studio::core::MetadataSupport;
-let mut item = Item::new();
+let mut item = Item::default();
 item.set_metadata("number1", 123);
 item.set_metadata("number2",456.78);
 item.set_metadata("note", String::from("This is a note"));
@@ -166,19 +165,19 @@ assert_eq!(item.get_metadata::<i32>("unknown metadata"), None);
 */
 impl MetadataSupport for Item {
     fn get_metadata<T: Any + Send + Sync + Clone>(&self, key: &str) -> Option<T> {
-        Option::<&T>::cloned(self.metadata.borrow().get(key))
+        self.metadata.get(key)
     }
 
     fn set_metadata<T: Any + Send + Sync + Clone>(&mut self, key: &str, value: T) {
-        self.metadata.borrow_mut().set(key, value);
+        self.metadata.set(key, value);
     }
 
     fn erase_metadata(&mut self, key: &String) {
-        self.metadata.borrow_mut().erase(key);
+        self.metadata.erase(key);
     }
 
     fn clear_metadata(&mut self) {
-        self.metadata.borrow_mut().clear();
+        self.metadata.clear();
     }
 }
 
