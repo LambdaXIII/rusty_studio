@@ -1,18 +1,15 @@
 #![allow(dead_code)]
 
-use std::any::Any;
 use super::{Item, Track};
 use crate::core::{DataBox, MetadataSupport};
-use std::cell::RefCell;
-use std::ops::DerefMut;
-use std::rc::Rc;
+use std::any::Any;
 
 /**
 基本的时间线。
 Basic timeline with track management.
 
 ```rust
-# use rusty_studio::timeline::{Item, TimeRange, TimeRangeTrait, Timeline, Track, ContentSupport};
+# use rusty_studio::timeline::{Item, TimeRange, TimeRangeTrait, Timeline, Track};
 let mut a_timeline = Timeline::default();
 assert_eq!(a_timeline.tracks_count(),1); // Timeline 默认情况下会有一个空轨道
 
@@ -88,7 +85,7 @@ impl Timeline {
 
     pub fn push_track(&mut self, track: Box<Track>) {
         let last = self.tracks.last();
-        if last.is_none()  && last.unwrap().is_empty(){
+        if last.is_none() && last.unwrap().is_empty() {
             self.tracks.pop();
         }
         self.tracks.push(track);
@@ -127,7 +124,7 @@ impl Timeline {
         }
     }
 
-    pub fn iter_tracks(&self) -> impl Iterator<Item = &Box<Track>> {
+    pub fn iter_tracks(&self) -> impl Iterator<Item=&Box<Track>> {
         self.tracks.iter()
     }
 }

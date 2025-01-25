@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use crate::core::{DataBox, MetadataSupport, Time};
-use crate::timeline::{ContentSupport, TimeRangeEditableTrait, TimeRangeTrait};
+use crate::timeline::{TimeRangeEditableTrait, TimeRangeTrait};
 use std::any::Any;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
@@ -56,6 +56,26 @@ impl Item {
             ..Default::default()
         }
     }
+
+    pub fn get_content<T>(&self) -> Option<T>
+    where
+        T: Any + Sync + Send + Clone,
+    {
+        self.content
+            .clone()
+            .and_then(|rc| rc.downcast_ref::<T>().cloned())
+    }
+
+    pub fn set_content<T>(&mut self, content: T)
+    where
+        T: Any + Sync + Send + Clone,
+    {
+        self.content = Some(Rc::new(content))
+    }
+
+    pub fn clear_content(&mut self) {
+        self.content = None
+    }
 }
 
 impl Default for Item {
@@ -86,7 +106,7 @@ Provide support for store a content in Any type.
 
 Exp1 基本操作:
 ```rust
-# use rusty_studio::timeline::{Item,ContentSupport};
+# use rusty_studio::timeline::Item;
 let mut item = Item::default();
 item.set_content::<i32>(123);
 assert_eq!(item.get_content::<i32>(), Some(123));
@@ -98,7 +118,7 @@ assert_eq!(item.get_content::<String>(), None);
 
 Exp2 使用自定义类型:
 ```rust
-# use rusty_studio::timeline::{Item,ContentSupport};
+# use rusty_studio::timeline::Item;
 #[derive(Debug, Clone, Eq, PartialEq)]
 struct RGBColor {
     r:u8,g:u8,b:u8
@@ -110,27 +130,7 @@ item.set_content(color.clone());
 assert_eq!(item.get_content::<RGBColor>(), Some(color));
 ```
 */
-impl ContentSupport for Item {
-    fn get_content<T>(&self) -> Option<T>
-    where
-        T: Any + Sync + Send + Clone,
-    {
-        self.content
-            .clone()
-            .and_then(|rc| rc.downcast_ref::<T>().cloned())
-    }
 
-    fn set_content<T>(&mut self, content: T)
-    where
-        T: Any + Sync + Send + Clone,
-    {
-        self.content = Some(Rc::new(content))
-    }
-
-    fn clear_content(&mut self) {
-        self.content = None
-    }
-}
 
 impl TimeRangeTrait for Item {
     fn start(&self) -> Time {
