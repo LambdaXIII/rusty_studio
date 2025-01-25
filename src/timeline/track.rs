@@ -1,6 +1,6 @@
 #![allow(dead_code)]
-use super::{Item, TimeRangeTrait};
-use crate::core::{DataBox, MetadataSupport, Time};
+use super::{Item};
+use crate::core::{DataBox, MetadataSupport, Time, TimeRangeSupport};
 use std::any::Any;
 use std::cell::RefCell;
 use std::ops::Deref;
@@ -36,7 +36,7 @@ impl Track {
         Self::default()
     }
 
-    fn update_end_cache(&mut self, item: &dyn TimeRangeTrait) {
+    fn update_end_cache(&mut self, item: &dyn TimeRangeSupport) {
         if self.end_cache.borrow().is_some() {
             let x = self.end_cache.borrow().unwrap();
             if x < item.end() {
@@ -84,7 +84,8 @@ impl Track {
     Search for insert point for a time range.
 
     ```rust
-    # use rusty_studio::timeline::{Item,TimeRange,TimeRangeTrait,Track};
+    # use rusty_studio::timeline::{Item,TimeRange,Track};
+    # use rusty_studio::core::TimeRangeSupport;
     let mut track = Track::default();
     let item = Item::from_timerange(TimeRange::from_millisecond(35,30));
     assert_eq!(track.find_insert_point(&item),0); //当不包含任何元素时，插入位置为0
@@ -97,7 +98,7 @@ impl Track {
     assert_eq!(track.find_insert_point(&item),2);
     ```
     */
-    pub fn find_insert_point(&self, item: &dyn TimeRangeTrait) -> usize {
+    pub fn find_insert_point(&self, item: &dyn TimeRangeSupport) -> usize {
         if self.items.is_empty() {
             return 0;
         }
@@ -119,7 +120,8 @@ impl Track {
     "Safe" insert point means: **The insert point before and after the element and the element to be inserted do not intersect in time.**
 
     ```rust
-    # use rusty_studio::timeline::{Item,TimeRange,TimeRangeTrait,Track};
+    # use rusty_studio::timeline::{Item,TimeRange,Track};
+    # use rusty_studio::core::TimeRangeSupport;
     let mut track = Track::default();
     let item1 = Item::from_timerange(TimeRange::from_millisecond(35,30));
     let item2 = Item::from_timerange(TimeRange::from_millisecond(45,10));
@@ -132,7 +134,7 @@ impl Track {
     assert_eq!(track.check_insert_point(2,&item2),true); //插入位置2与item2不相交
     ```
     */
-    pub fn check_insert_point(&self, index: usize, item: &dyn TimeRangeTrait) -> bool {
+    pub fn check_insert_point(&self, index: usize, item: &dyn TimeRangeSupport) -> bool {
         if index >= self.items.len() {
             return true;
         }
@@ -165,7 +167,8 @@ impl Track {
     Return the inserted index.
 
     ```rust
-    # use rusty_studio::timeline::{Item,TimeRange,TimeRangeTrait,Track};
+    # use rusty_studio::timeline::{Item,TimeRange,Track};
+    # use rusty_studio::core::TimeRangeSupport;
     let mut track = Track::default();
     let item = Item::from_timerange(TimeRange::from_millisecond(35,30));
     track.force_push_item(Box::new(Item::from_timerange(TimeRange::from_millisecond(5,5))));
@@ -191,7 +194,8 @@ impl Track {
     无论成功与否，返回值为可用的插入索引。
     Return the inserted index no matter success or not.
     ```rust
-    # use rusty_studio::timeline::{Item,TimeRange,TimeRangeTrait,Track};
+    # use rusty_studio::timeline::{Item,TimeRange,Track};
+    # use rusty_studio::core::TimeRangeSupport;
     let mut track = Track::default();
     let item1 = Item::from_timerange(TimeRange::from_millisecond(40,30)); //safe
     let item2 = Item::from_timerange(TimeRange::from_millisecond(30,10)); //unsafe
@@ -238,7 +242,7 @@ impl Track {
     }
 }
 
-impl TimeRangeTrait for Track {
+impl TimeRangeSupport for Track {
     fn start(&self) -> Time {
         Time::default()
     }

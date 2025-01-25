@@ -1,16 +1,16 @@
 #![allow(unused_macros)]
-use super::{TimeRangeEditableTrait, TimeRangeTrait};
+use crate::core::{TimeRangeEditingSupport, TimeRangeSupport};
 use crate::core::Time;
 
 /**
 一个纯粹的时间范围结构体。
 Simply represents a time range.
 
-除了实现了 TimeRangeTrait 和 TimeRangeEditableTrait 之外，
+除了实现了 TimeRangeSupport 和 TimeRangeEditingSupport 之外，
 还增加了一些额外的方法用于操作时间段。
 
 Though, it also implements some methods to operate the time range,
-other than TimeRangeTrait and TimeRangeEditableTrait.
+other than TimeRangeSupport and TimeRangeEditingSupport.
 */
 #[derive(Debug, Clone, Copy)]
 pub struct TimeRange {
@@ -31,12 +31,13 @@ impl TimeRange {
     }
 
     /**
-    从另一个 TimeRangeTrait 对象构造时间段。
-    Construct Timerange from another struct implemented TimeRangeTrait.
+    从另一个 TimeRangeSupport 对象构造时间段。
+    Construct Timerange from another struct implemented TimeRangeSupport.
 
     Example:
     ```rust
-    # use rusty_studio::timeline::{Item,TimeRange,TimeRangeTrait};
+    # use rusty_studio::timeline::{Item,TimeRange};
+    # use rusty_studio::core::TimeRangeSupport;
     let range = TimeRange::from_millisecond(10,30);
     let item = Item::from_timerange(range);
     assert_eq!(item.start().to_millisecond(),10);
@@ -44,7 +45,7 @@ impl TimeRange {
     assert_eq!(item.duration().to_millisecond(),30);
     ```
     */
-    pub fn from_timerange(range: &dyn TimeRangeTrait) -> Self {
+    pub fn from_timerange(range: &dyn TimeRangeSupport) -> Self {
         Self {
             start: range.start(),
             duration: range.duration(),
@@ -59,8 +60,8 @@ impl TimeRange {
 
     Example:
     ```rust
-    # use rusty_studio::timeline::{Item,TimeRange,TimeRangeTrait};
-    # use rusty_studio::core::Time;
+    # use rusty_studio::timeline::{Item,TimeRange};
+    # use rusty_studio::core::{Time,TimeRangeSupport};
     let ranges = vec![
         TimeRange::from_millisecond(10,20),
         TimeRange::from_millisecond(20,30),
@@ -74,7 +75,7 @@ impl TimeRange {
     */
     pub fn whole_timerange<I>(ranges: &Vec<I>) -> Self
     where
-        I: TimeRangeTrait,
+        I: TimeRangeSupport,
     {
         let mut start: Option<Time> = None;
         let mut end: Option<Time> = None;
@@ -93,7 +94,7 @@ impl TimeRange {
     }
 }
 
-impl TimeRangeTrait for TimeRange {
+impl TimeRangeSupport for TimeRange {
     fn start(&self) -> Time {
         self.start
     }
@@ -103,7 +104,7 @@ impl TimeRangeTrait for TimeRange {
     }
 }
 
-impl TimeRangeEditableTrait for TimeRange {
+impl TimeRangeEditingSupport for TimeRange {
     fn set_start(&mut self, start: Time) {
         self.start = start;
     }

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use crate::core::{DataBox, MetadataSupport, Time};
-use crate::timeline::{TimeRangeEditableTrait, TimeRangeTrait};
+use crate::core::{TimeRangeEditingSupport, TimeRangeSupport};
 use std::any::Any;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
@@ -49,7 +49,7 @@ impl Item {
     }
 
     ///从另一个 TimeRangeTrait 对象构造一个空的片段 | Construct an Item from a TimeRange.
-    pub fn from_timerange<T: TimeRangeTrait>(range: T) -> Self {
+    pub fn from_timerange<T: TimeRangeSupport>(range: T) -> Self {
         Self {
             start: range.start(),
             duration: range.duration(),
@@ -132,7 +132,7 @@ assert_eq!(item.get_content::<RGBColor>(), Some(color));
 */
 
 
-impl TimeRangeTrait for Item {
+impl TimeRangeSupport for Item {
     fn start(&self) -> Time {
         self.start
     }
@@ -142,7 +142,7 @@ impl TimeRangeTrait for Item {
     }
 }
 
-impl TimeRangeEditableTrait for Item {
+impl TimeRangeEditingSupport for Item {
     fn set_start(&mut self, start: Time) {
         self.start = start;
     }

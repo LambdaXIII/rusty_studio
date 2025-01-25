@@ -10,7 +10,7 @@ Defines basic functions for a TimeRange.
 The default implement assumes the struct stores only the start time point
 and the duration, the end time point will be calculated from the two `Time`.
 */
-pub trait TimeRangeTrait {
+pub trait TimeRangeSupport {
     ///时间段的起始时间点 | Start time of the TimeRange
     fn start(&self) -> Time;
     
@@ -33,7 +33,7 @@ pub trait TimeRangeTrait {
     }
 
     ///检查时间段是否和另一个时间段相交 | Check if this TimeRange is overlapped with another TimeRange.
-    fn overlaps(&self, other: &dyn TimeRangeTrait) -> bool {
+    fn overlaps(&self, other: &dyn TimeRangeSupport) -> bool {
         // self.contains(&other.start()) || self.contains(&other.end()) || other.contains(&self.start()) || other.contains(&self.end())
         self.start() <= other.end() && self.end() >= other.start()
     }
@@ -51,9 +51,9 @@ Provides functions to manipulate TimeRange.
 
 Depends on TimeRangeTrait.
 */
-pub trait TimeRangeEditableTrait
+pub trait TimeRangeEditingSupport
 where
-    Self: TimeRangeTrait,
+    Self: TimeRangeSupport,
 {
     ///设置开始时间点 | Set a new start time
     fn set_start(&mut self, start: Time);
@@ -85,21 +85,21 @@ where
     }
 }
 
-impl PartialEq for dyn TimeRangeTrait {
+impl PartialEq for dyn TimeRangeSupport {
     fn eq(&self, other: &Self) -> bool {
         self.start() == other.start() && self.duration() == other.duration()
     }
 }
 
-impl Eq for dyn TimeRangeTrait {}
+impl Eq for dyn TimeRangeSupport {}
 
-impl PartialOrd for dyn TimeRangeTrait {
+impl PartialOrd for dyn TimeRangeSupport {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.start().partial_cmp(&other.start())
     }
 }
 
-impl Ord for dyn TimeRangeTrait {
+impl Ord for dyn TimeRangeSupport {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.start().cmp(&other.start())
     }

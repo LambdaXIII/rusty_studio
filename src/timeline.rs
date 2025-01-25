@@ -3,10 +3,7 @@
 mod item;
 mod timeline;
 mod timerange;
-mod timerange_trait;
 mod track;
-
-pub use timerange_trait::*;
 
 pub use item::*;
 pub use timeline::*;

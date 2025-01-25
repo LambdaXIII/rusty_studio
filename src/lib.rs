@@ -9,3 +9,4 @@ pub mod core;
 提供一系列模拟多媒体制作中的时间线的方方面面的组件。
 */
 pub mod timeline;
+pub mod subtitle;

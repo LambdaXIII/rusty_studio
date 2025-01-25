@@ -1,15 +1,17 @@
 #![allow(dead_code)]
 
 use super::{Item, Track};
-use crate::core::{DataBox, MetadataSupport};
+use crate::core::{DataBox, MetadataSupport, Time, TimeRangeSupport};
 use std::any::Any;
+use std::cmp::max;
 
 /**
 基本的时间线。
 Basic timeline with track management.
 
 ```rust
-# use rusty_studio::timeline::{Item, TimeRange, TimeRangeTrait, Timeline, Track};
+# use rusty_studio::timeline::{Item, TimeRange, Timeline, Track};
+# use rusty_studio::core::TimeRangeSupport;
 let mut a_timeline = Timeline::default();
 assert_eq!(a_timeline.tracks_count(),1); // Timeline 默认情况下会有一个空轨道
 
@@ -42,6 +44,10 @@ assert_eq!(track.get(0).unwrap().get_content::<String>().unwrap(),String::from("
 assert_eq!(track.get(1).unwrap().get_content::<String>().unwrap(),String::from("clip5"));
 let track:&Box<Track> = a_timeline.get_track(2).unwrap();
 assert_eq!(track.get(0).unwrap().get_content::<String>().unwrap(),String::from("clip6"));
+
+// timeline 的时长取自最长的轨道
+let duration = a_timeline.duration();
+assert_eq!(duration.to_millisecond(),150);
 ```
 */
 pub struct Timeline {
@@ -144,5 +150,17 @@ impl MetadataSupport for Timeline {
 
     fn clear_metadata(&mut self) {
         self.metadata.clear()
+    }
+}
+
+impl TimeRangeSupport for Timeline {
+    fn start(&self) -> Time {
+        Time::default()
+    }
+
+    fn duration(&self) -> Time {
+        self.tracks.iter().fold(Time::default(), |acc, track| {
+            max(acc, track.end())
+        })
     }
 }
