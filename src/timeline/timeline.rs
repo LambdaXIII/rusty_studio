@@ -86,4 +86,12 @@ impl Timeline {
             self.push_track(track);
         }
     }
+    
+    pub fn iter_tracks(&self) -> impl Iterator<Item=&Rc<RefCell<Track>>> {
+        self.tracks.iter()
+    }
+    
+    pub fn clear(&mut self) {
+        self.tracks.clear();
+    }
 }

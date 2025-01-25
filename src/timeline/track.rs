@@ -1,10 +1,9 @@
+#![allow(dead_code)]
 use super::{Item, TimeRangeTrait};
 use crate::core::{DataBox, MetadataSupport, Time};
 use std::any::Any;
 use std::cell::RefCell;
-use std::cmp::Ordering;
 use std::ops::Deref;
-use std::sync::RwLock;
 
 pub struct Track {
     items: Vec<Box<Item>>,
@@ -39,11 +38,15 @@ impl Track {
 
     fn update_end_cache(&mut self, item: &dyn TimeRangeTrait) {
         if self.end_cache.borrow().is_some() {
-            let x  = self.end_cache.borrow().unwrap();
-            if x < item.end(){
+            let x = self.end_cache.borrow().unwrap();
+            if x < item.end() {
                 self.end_cache.borrow_mut().replace(item.end());
             }
         }
+    }
+
+    pub fn iter_items(&self) -> impl Iterator<Item = &Box<Item>> {
+        self.items.iter()
     }
 
     pub fn force_push_item(&mut self, item: Box<Item>) {
@@ -102,9 +105,9 @@ impl Track {
             return self.items.len();
         }
 
-        let search = self.items.binary_search_by(|x| {
-            x.start().cmp(&item.start())
-        });
+        let search = self
+            .items
+            .binary_search_by(|x| x.start().cmp(&item.start()));
         search.unwrap_or_else(|index| index)
     }
 
